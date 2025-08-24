@@ -1,0 +1,56 @@
+name: waste_not_app
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_rating_bar: ^4.0.0 # Corrected package version
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+
+  assets:
+    - assets/Images/home_slide1.png
+    - assets/Images/home_slide2.png
+    - assets/Images/home_slide3.png
+    - assets/Images/home_slide4.png
+    - assets/Images/food_donatation.png
+    - assets/Images/book_donatation.png
+    - assets/Images/cloth_donatation.png
+    - assets/Images/special_days.png 
+    - assets/Images/customer-service.png 
+    - assets/Images/upcoming_event.png 
+    - assets/Images/featurede_ngo.png 
+    - assets/Images/bell.png
+    - assets/Images/feedback.png
+    - assets/Images/heart.png
+    - assets/Images/key.png
+    - assets/Images/logout.png
+    - assets/Images/setting.png
+    - assets/Images/support.png
+    - assets/Images/book.png
+    - assets/Images/books.png
+    - assets/Images/calendar.png
+    - assets/Images/clothes.png
+    - assets/Images/food.png
+    - assets/Images/location.png
+    - assets/Images/notes.png
+    - assets/Images/phone.png
+    - assets/Images/quantity.png
+    - assets/Images/sharing.png
+    - assets/Images/time.png
+    - assets/Images/upload.png
+    - assets/Images/avatar.png
