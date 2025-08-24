@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'donate_feedback.dart';
+import 'notification_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -17,7 +19,8 @@ class ProfileScreen extends StatelessWidget {
         navBarHeight -
         MediaQuery.of(context).padding.top;
 
-    final double whiteContainerHeight = availableHeight + 22;
+    // Fixed: Removed the +22 that was causing overflow
+    final double whiteContainerHeight = availableHeight;
 
     final List<_ProfileTileData> tiles = [
       _ProfileTileData(
@@ -65,7 +68,10 @@ class ProfileScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               child: Row(
                 children: [
-                  Icon(Icons.arrow_back, color: headingColor, size: 24),
+                  IconButton(
+                    icon: Icon(Icons.arrow_back, color: headingColor, size: 24),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Text(
@@ -127,7 +133,7 @@ class ProfileScreen extends StatelessWidget {
                           children: [
                             const SizedBox(height: 5),
                             Text(
-                              "Name",
+                              "Aditya",
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 18,
@@ -136,7 +142,7 @@ class ProfileScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              "email address",
+                              "honraoaditya10@gmail.com",
                               style: TextStyle(
                                 color: Colors.black54,
                                 fontSize: 14,
@@ -188,7 +194,23 @@ class ProfileScreen extends StatelessWidget {
                                 assetIconPath: tiles[i].assetIconPath,
                                 text: tiles[i].text,
                                 onTap: () {
-                                  // Do nothing on tap for now
+                                  // Handle navigation based on tile text
+                                  if (tiles[i].text == 'Feedback') {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const FeedbackPage(),
+                                      ),
+                                    );
+                                  } else if (tiles[i].text == 'Notifications') {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const NotificationScreen(),
+                                      ),
+                                    );
+                                  }
+                                  // Add other navigation cases here for other tiles
                                 },
                               ),
                             );
@@ -220,7 +242,6 @@ class _ProfileListTile extends StatelessWidget {
   final VoidCallback? onTap;
 
   const _ProfileListTile({
-    super.key,
     required this.assetIconPath,
     required this.text,
     this.onTap,

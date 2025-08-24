@@ -11,7 +11,10 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  flutter_rating_bar: ^4.0.0 # Corrected package version
+  flutter_rating_bar: ^4.0.0
+  url_launcher: ^6.2.5
+
+
 
 dev_dependencies:
   flutter_test:
@@ -54,3 +57,11 @@ flutter:
     - assets/Images/time.png
     - assets/Images/upload.png
     - assets/Images/avatar.png
+    - assets/Images/img1.jpg
+    - assets/Images/img2.jpg
+    - assets/Images/img3.jpg
+    - assets/Images/img4.jpg
+    - assets/Images/calendar2.png
+    - assets/Images/earth1.png
+    - assets/Images/book1.png
+    - assets/Images/guidelines.png

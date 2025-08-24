@@ -1,23 +1,5 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  FlutterError.onError = (FlutterErrorDetails details) {};
-  ErrorWidget.builder = (FlutterErrorDetails details) => Container();
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Notification UI',
-      debugShowCheckedModeBanner: false,
-      home: const NotificationScreen(),
-    );
-  }
-}
-
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({super.key});
 
@@ -40,7 +22,10 @@ class NotificationScreen extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Icon(Icons.arrow_back, color: headingColor, size: 26),
+                  IconButton(
+                    icon: Icon(Icons.arrow_back, color: headingColor, size: 26),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Text(
