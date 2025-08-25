@@ -13,6 +13,10 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_rating_bar: ^4.0.0
   url_launcher: ^6.2.5
+  firebase_core: ^3.15.2
+  firebase_database: ^11.0.0
+  geolocator: ^10.1.0
+  permission_handler: ^11.0.1
 
 
 
@@ -65,3 +69,4 @@ flutter:
     - assets/Images/earth1.png
     - assets/Images/book1.png
     - assets/Images/guidelines.png
+    - assets/Images/logo.png

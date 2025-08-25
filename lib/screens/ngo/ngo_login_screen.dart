@@ -1,158 +1,243 @@
 import 'package:flutter/material.dart';
+import '../welcome_screen.dart';
+import 'ngo_home_page.dart'; // <-- Make sure this matches your file name!
 
-class NGOLoginPage extends StatelessWidget {
+class NGOLoginPage extends StatefulWidget {
   const NGOLoginPage({super.key});
 
   @override
+  State<NGOLoginPage> createState() => _NGOLoginPageState();
+}
+
+class _NGOLoginPageState extends State<NGOLoginPage> {
+  // Temporary credentials
+  final String tempEmail = "ngo@example.com";
+  final String tempPassword = "ngo12345";
+  
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  String? _errorText;
+
+  bool _obscurePassword = true;
+
+  @override
   Widget build(BuildContext context) {
-    // For responsive width (mobile/web)
-    final double width = MediaQuery.of(context).size.width;
-    final bool isNarrow = width < 400;
+    // Theme constants, similar to donor login (with darker textfields/colors)
+    const Color mainBlue = Color(0xFF3674B5);
+    const Color fieldBlue = Color(0xFF225277);  // Darker shade for themed fields
+    const Color bgLight = Color(0xFF88BCD9);    // Slightly darker background
+    const Color gradientStrong = Color(0xFF3674B5);
+    const Color fillColor = Color(0xFFDBE6EF);  // Even darker field background
+    const Color textColor = Color(0xFF192A38);
+    const Color hintTextColor = Color(0xFF3B4F66);
 
     return Scaffold(
-      backgroundColor: Colors.black87,
-      body: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 380, maxHeight: 700),
-          margin: const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF3674B5), // #3674B5
-                Color(0xFFA1E3F9), // #A1E3F9
-              ],
-            ),
+      backgroundColor: bgLight,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: gradientStrong),
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+            );
+          },
+        ),
+      ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [bgLight, gradientStrong],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: isNarrow ? 14 : 30,
-                vertical: isNarrow ? 24 : 48,
-              ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
               child: Column(
                 children: [
-                  const SizedBox(height: 30),
-                  // Welcome
+                  const SizedBox(height: 20),
                   const Text(
                     "Welcome to WasteNot",
-                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: mainBlue,
                       fontWeight: FontWeight.w800,
-                      fontSize: 26,
-                      letterSpacing: 0.6,
+                      fontSize: 28,
+                      letterSpacing: 1.1,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 6),
                   const Text(
                     "Together, we save and share",
-                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Color(0xFFECF7FF),
-                      fontWeight: FontWeight.w400,
+                      color: fieldBlue,
+                      fontWeight: FontWeight.w500,
                       fontSize: 14,
+                      letterSpacing: 0.2,
                     ),
                   ),
-                  const SizedBox(height: 32),
-
-                  // Login Card
+                  const SizedBox(height: 26),
                   Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 26),
+                    width: MediaQuery.of(context).size.width * 0.90,
+                    padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 28),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(18),
-                      boxShadow: const [
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
                         BoxShadow(
-                          color: Color(0x33000000), // black with 20% opacity
-                          blurRadius: 24,
-                          spreadRadius: 3,
-                          offset: Offset(0, 12),
-                        ),
-                        BoxShadow(
-                          color: Color(0x118BB7D6), // blue tint for ambient shadow
-                          blurRadius: 40,
-                          spreadRadius: 8,
-                          offset: Offset(0, 2),
+                          color: mainBlue.withOpacity(0.14),
+                          blurRadius: 30,
+                          offset: const Offset(0, 8),
                         ),
                       ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Login as NGO
                         const Text(
                           "Login as NGO",
                           style: TextStyle(
-                            color: Color(0xFF3674B5),
+                            color: mainBlue,
                             fontWeight: FontWeight.w700,
-                            fontSize: 22,
-                            letterSpacing: 0.3,
+                            fontSize: 21,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 4),
                         const Text(
                           "Access your account to keep spreading hope\nand kindness.",
-                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Color(0xFF8BB7D6),
+                            color: fieldBlue,
                             fontSize: 13.5,
-                            fontWeight: FontWeight.w500,
                           ),
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Email Field
-                        _LoginTextField(
-                          label: "Email Address",
-                          hint: "Enter Your Email",
-                          icon: Icons.email_outlined,
-                          obscure: false,
+                          textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 18),
 
+                        // Email Field
+                        _ThemedTextField(
+                          label: "Email Address",
+                          hint: "Enter Your Email",
+                          icon: Icons.email_outlined,
+                          color: fieldBlue,
+                          fillColor: fillColor,
+                          textColor: textColor,
+                          hintTextColor: hintTextColor,
+                          borderColor: fieldBlue,
+                          controller: _emailController,
+                        ),
+                        const SizedBox(height: 13),
+
                         // Password Field
-                        _LoginTextField(
+                        _ThemedTextField(
                           label: "Password",
                           hint: "Enter Your Password",
                           icon: Icons.lock_outline,
-                          obscure: true,
+                          color: fieldBlue,
+                          fillColor: fillColor,
+                          textColor: textColor,
+                          hintTextColor: hintTextColor,
+                          borderColor: fieldBlue,
+                          controller: _passwordController,
+                          obscure: _obscurePassword,
+                          suffix: IconButton(
+                            icon: Icon(
+                              _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility,
+                              color: fieldBlue,
+                            ),
+                            onPressed: () {
+                              setState(() => _obscurePassword = !_obscurePassword);
+                            },
+                          ),
                         ),
-                        const SizedBox(height: 26),
+                        const SizedBox(height: 20),
 
-                        // Log In Button
+                        if (_errorText != null)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10.0),
+                            child: Text(
+                              _errorText!,
+                              style: const TextStyle(color: Colors.red, fontSize: 13),
+                            ),
+                          ),
+
                         SizedBox(
                           width: double.infinity,
+                          height: 46,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF3674B5),
-                              foregroundColor: Colors.white,
-                              elevation: 6,
-                              shadowColor: Colors.black45,
-                              padding: const EdgeInsets.symmetric(vertical: 13),
+                              backgroundColor: mainBlue,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(14),
                               ),
+                              elevation: 2,
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              setState(() {
+                                _errorText = null;
+                              });
+                              // Temporary login validation
+                              if (_emailController.text.trim() == tempEmail &&
+                                  _passwordController.text == tempPassword) {
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(builder: (context) => const NGODonationManagementHeader()),
+                                );
+                              } else {
+                                setState(() {
+                                  _errorText = "Invalid NGO email or password.";
+                                });
+                              }
+                            },
                             child: const Text(
                               "Log In",
                               style: TextStyle(
+                                color: Colors.white,
                                 fontWeight: FontWeight.w700,
-                                fontSize: 16.5,
-                                letterSpacing: 0.2,
+                                fontSize: 17,
+                                letterSpacing: 0.7,
                               ),
                             ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        // Show temp credentials for demo
+                        Container(
+                          margin: const EdgeInsets.only(top: 8),
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
+                          decoration: BoxDecoration(
+                            color: fillColor,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            children: const [
+                              Text(
+                                "Demo NGO Credentials:",
+                                style: TextStyle(
+                                  color: fieldBlue,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              SizedBox(height: 3),
+                              Text(
+                                "Email: ngo@example.com\nPassword: ngo12345",
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontSize: 13,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
-
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 35),
                 ],
               ),
             ),
@@ -163,17 +248,31 @@ class NGOLoginPage extends StatelessWidget {
   }
 }
 
-class _LoginTextField extends StatelessWidget {
+class _ThemedTextField extends StatelessWidget {
   final String label;
   final String hint;
   final IconData icon;
+  final Color color;
+  final Color fillColor;
+  final Color textColor;
+  final Color hintTextColor;
+  final Color borderColor;
   final bool obscure;
+  final Widget? suffix;
+  final TextEditingController? controller;
 
-  const _LoginTextField({
+  const _ThemedTextField({
     required this.label,
     required this.hint,
     required this.icon,
-    required this.obscure,
+    required this.color,
+    required this.fillColor,
+    required this.textColor,
+    required this.hintTextColor,
+    required this.borderColor,
+    this.obscure = false,
+    this.suffix,
+    this.controller,
   });
 
   @override
@@ -183,40 +282,32 @@ class _LoginTextField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: Color(0xFF3674B5),
+          style: TextStyle(
+            color: color,
             fontWeight: FontWeight.w600,
-            fontSize: 13.5,
+            fontSize: 14.5,
           ),
         ),
-        const SizedBox(height: 5),
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFFF7FBFF),
-            borderRadius: BorderRadius.circular(26),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x1A3674B5), // blue with 10% opacity
-                blurRadius: 6,
-                offset: Offset(0, 2),
-              ),
-            ],
-            border: Border.all(
-              color: Color(0xFFBCE0FB),
-              width: 1.1,
+        const SizedBox(height: 2),
+        TextFormField(
+          controller: controller,
+          obscureText: obscure,
+          style: TextStyle(color: textColor),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: fillColor,
+            hintText: hint,
+            hintStyle: TextStyle(color: hintTextColor),
+            prefixIcon: Icon(icon, color: color),
+            suffixIcon: suffix,
+            contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: borderColor, width: 1.4),
+              borderRadius: BorderRadius.circular(12),
             ),
-          ),
-          child: TextField(
-            obscureText: obscure,
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: const TextStyle(color: Color(0xFFB1BFD5), fontSize: 14),
-              prefixIcon: Icon(icon, color: Color(0xFF3674B5)),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-              suffixIcon: obscure
-                  ? Icon(Icons.visibility_off_outlined, color: Color(0xFFB1BFD5))
-                  : null,
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: borderColor, width: 2.0),
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
         ),

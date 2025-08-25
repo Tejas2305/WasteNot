@@ -344,7 +344,7 @@ class _HomePageState extends State<HomePage> {
                   height: 50,
                   width: 50,
                   child: Image.asset(
-                    "assets/Images/guidelines.png",
+                    "assets/Images/home_slide4.png",
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -366,8 +366,8 @@ class _HomePageState extends State<HomePage> {
   Widget _buildDonationOptions() {
     final options = [
       {"icon": "assets/Images/food_donatation.png", "label": "FOOD"},
-      {"icon": "assets/Images/cloth_donatation.png", "label": "CLOTHS"},
-      {"icon": "assets/Images/book_donatation.png", "label": "BOOKS"},
+      {"icon": "assets/Images/cloth_donatation.png", "label": "CLOTH"},
+      {"icon": "assets/Images/book_donatation.png", "label": "BOOK"},
     ];
 
     return Column(

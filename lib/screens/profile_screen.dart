@@ -1,9 +1,337 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'donate_feedback.dart';
 import 'notification_screen.dart';
+import 'your_donation.dart';
+import 'donatation_guidlines.dart';
+import 'help_center_screen.dart';
+import 'donation_reminder_screen.dart';
+import 'upcoming_event_screen.dart';
+import 'welcome_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String _userDisplayName = "Tejas2305";
+  String _userEmail = "tejas2305@example.com";
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentUser();
+  }
+
+  void _getCurrentUser() {
+    User? currentUser = _auth.currentUser;
+    if (currentUser != null) {
+      String email = currentUser.email ?? "";
+      String displayName = currentUser.displayName ?? "";
+      
+      setState(() {
+        _userEmail = email;
+        if (displayName.isNotEmpty) {
+          _userDisplayName = displayName;
+        } else if (email.isNotEmpty) {
+          _userDisplayName = email.split('@')[0];
+        } else {
+          _userDisplayName = "Tejas2305";
+        }
+      });
+    }
+  }
+
+  Future<void> _handleLogout() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Logout'),
+          content: const Text('Are you sure you want to log out?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                try {
+                  await _auth.signOut();
+                  if (mounted) {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+                      (route) => false,
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error logging out: $e')),
+                    );
+                  }
+                }
+              },
+              child: const Text('Logout', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _handleNavigation(String tileText) {
+    switch (tileText) {
+      case 'My donation':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => DonationHistoryScreen()),
+        );
+        break;
+      case 'Donation reminder':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const DonationReminderPage()),
+        );
+        break;
+      case 'Change password':
+        _showChangePasswordDialog();
+        break;
+      case 'Settings':
+        _showSettingsDialog();
+        break;
+      case 'Notifications':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const NotificationScreen()),
+        );
+        break;
+      case 'Help Center':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) =>  HelpCenterScreen()),
+        );
+        break;
+      case 'Feedback':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const FeedbackPage()),
+        );
+        break;
+      case 'Log Out':
+        _handleLogout();
+        break;
+      default:
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$tileText feature coming soon!')),
+        );
+    }
+  }
+
+  void _showChangePasswordDialog() {
+    final TextEditingController currentPasswordController = TextEditingController();
+    final TextEditingController newPasswordController = TextEditingController();
+    final TextEditingController confirmPasswordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Change Password'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: currentPasswordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Current Password',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: newPasswordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'New Password',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: confirmPasswordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Confirm New Password',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (newPasswordController.text != confirmPasswordController.text) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Passwords do not match')),
+                  );
+                  return;
+                }
+                
+                try {
+                  User? user = _auth.currentUser;
+                  if (user != null) {
+                    // Re-authenticate user first
+                    AuthCredential credential = EmailAuthProvider.credential(
+                      email: user.email!,
+                      password: currentPasswordController.text,
+                    );
+                    await user.reauthenticateWithCredential(credential);
+                    
+                    // Update password
+                    await user.updatePassword(newPasswordController.text);
+                    
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Password updated successfully')),
+                    );
+                  }
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error updating password: $e')),
+                  );
+                }
+              },
+              child: const Text('Update'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSettingsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Settings'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.notifications),
+                title: const Text('Notification Settings'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const NotificationScreen()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.help),
+                title: const Text('Donation Guidelines'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => DonationGuidelinesScreen()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.event),
+                title: const Text('Upcoming Events'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => UpcomingEventsScreen()),
+                  );
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditProfileDialog() {
+    final TextEditingController nameController = TextEditingController(text: _userDisplayName);
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit Profile'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Display Name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Email: $_userEmail',
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                try {
+                  User? user = _auth.currentUser;
+                  if (user != null) {
+                    await user.updateDisplayName(nameController.text);
+                    setState(() {
+                      _userDisplayName = nameController.text;
+                    });
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Profile updated successfully')),
+                    );
+                  }
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error updating profile: $e')),
+                  );
+                }
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +347,6 @@ class ProfileScreen extends StatelessWidget {
         navBarHeight -
         MediaQuery.of(context).padding.top;
 
-    // Fixed: Removed the +22 that was causing overflow
     final double whiteContainerHeight = availableHeight;
 
     final List<_ProfileTileData> tiles = [
@@ -123,7 +450,14 @@ class ProfileScreen extends StatelessWidget {
                         child: CircleAvatar(
                           radius: 38,
                           backgroundColor: Color(0xFFAB7DF6),
-                          backgroundImage: AssetImage('assets/Images/avatar.png'),
+                          child: Text(
+                            _userDisplayName.isNotEmpty ? _userDisplayName[0].toUpperCase() : 'T',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 20),
@@ -133,7 +467,7 @@ class ProfileScreen extends StatelessWidget {
                           children: [
                             const SizedBox(height: 5),
                             Text(
-                              "Aditya",
+                              _userDisplayName,
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 18,
@@ -142,7 +476,7 @@ class ProfileScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              "honraoaditya10@gmail.com",
+                              _userEmail,
                               style: TextStyle(
                                 color: Colors.black54,
                                 fontSize: 14,
@@ -162,7 +496,7 @@ class ProfileScreen extends StatelessWidget {
                                   ),
                                   padding: const EdgeInsets.symmetric(horizontal: 18),
                                 ),
-                                onPressed: () {},
+                                onPressed: _showEditProfileDialog,
                                 child: const Text(
                                   'Edit Profile',
                                   style: TextStyle(
@@ -193,25 +527,7 @@ class ProfileScreen extends StatelessWidget {
                               child: _ProfileListTile(
                                 assetIconPath: tiles[i].assetIconPath,
                                 text: tiles[i].text,
-                                onTap: () {
-                                  // Handle navigation based on tile text
-                                  if (tiles[i].text == 'Feedback') {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const FeedbackPage(),
-                                      ),
-                                    );
-                                  } else if (tiles[i].text == 'Notifications') {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const NotificationScreen(),
-                                      ),
-                                    );
-                                  }
-                                  // Add other navigation cases here for other tiles
-                                },
+                                onTap: () => _handleNavigation(tiles[i].text),
                               ),
                             );
                           }),
@@ -225,7 +541,6 @@ class ProfileScreen extends StatelessWidget {
           ],
         ),
       ),
-      // bottomNavigationBar removed as requested
     );
   }
 }
@@ -263,6 +578,14 @@ class _ProfileListTile extends StatelessWidget {
                 width: 26,
                 height: 26,
                 fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  // Fallback icon if image asset is not found
+                  return Icon(
+                    _getIconForText(text),
+                    size: 26,
+                    color: const Color(0xFFAB7DF6),
+                  );
+                },
               ),
               const SizedBox(width: 20),
               Text(
@@ -273,10 +596,39 @@ class _ProfileListTile extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
+              const Spacer(),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: Colors.grey[400],
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  IconData _getIconForText(String text) {
+    switch (text) {
+      case 'My donation':
+        return Icons.volunteer_activism;
+      case 'Donation reminder':
+        return Icons.notifications;
+      case 'Change password':
+        return Icons.lock;
+      case 'Settings':
+        return Icons.settings;
+      case 'Notifications':
+        return Icons.notifications_active;
+      case 'Help Center':
+        return Icons.help_center;
+      case 'Feedback':
+        return Icons.feedback;
+      case 'Log Out':
+        return Icons.logout;
+      default:
+        return Icons.circle;
+    }
   }
 }
